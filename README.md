@@ -25,7 +25,7 @@ Add to your `docker-compose.yml`:
       - 'PGID=$PGID'
       - 'UMASK=$UMASK'
       - 'TZ=$TZ'
-      - 'QBITTORRENT_URL=http://localhost:6767'
+      - 'QBITTORRENT_URL=http://qbittorrentvpn:6767'
       - 'QBITTORRENT_USER=admin'
       - 'QBITTORRENT_PASS=your-password-here'
       - 'CHECK_INTERVAL_DAYS=30'
@@ -71,6 +71,13 @@ This means with default settings:
 - Over time, all torrents get checked, but spread out to minimize load
 
 ## Environment Variables
+
+### User/Group
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PUID` | `1000` | User ID to run as |
+| `PGID` | `1000` | Group ID to run as |
 
 ### Connection
 
