@@ -7,8 +7,8 @@ PGID=${PGID:-1000}
 echo "Starting with UID: $PUID, GID: $PGID"
 
 # Create group and user with specified IDs
-addgroup -g "$PGID" keeper 2>/dev/null
-adduser -D -u "$PUID" -G keeper keeper 2>/dev/null
+addgroup -g "$PGID" nobody 2>/dev/null
+adduser -D -u "$PUID" -G nobody nobody 2>/dev/null
 
 # Ensure /config exists and has correct ownership
 mkdir -p /config
