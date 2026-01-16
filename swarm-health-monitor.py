@@ -528,6 +528,7 @@ def main():
         if shutdown_requested:
             break
         
+        logging.info(f"Seeder thresholds - Critical: <={CRITICAL_SEEDERS}, Rare: <={RARE_SEEDERS}, Low: <={LOW_SEEDERS}")
         logging.info(f"Next run in {RUN_INTERVAL_HOURS} hours. Sleeping...")
         
         # Sleep in small increments to respond to shutdown signals
