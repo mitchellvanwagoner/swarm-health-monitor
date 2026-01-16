@@ -51,9 +51,9 @@ RUN_INTERVAL_HOURS = get_env_float("RUN_INTERVAL_HOURS", 24.0)    # Hours betwee
 STARTUP_DELAY_SECONDS = get_env_int("STARTUP_DELAY_SECONDS", 60)  # Wait for qBittorrent to be ready
 
 # Thresholds for rarity classification
-CRITICAL_SEEDERS = get_env_int("CRITICAL_SEEDERS", 2)
-RARE_SEEDERS = get_env_int("RARE_SEEDERS", 5)
-LOW_SEEDERS = get_env_int("LOW_SEEDERS", 10)
+CRITICAL_SEEDERS = get_env_int("CRITICAL_SEEDERS", 1)
+RARE_SEEDERS = get_env_int("RARE_SEEDERS", 2)
+LOW_SEEDERS = get_env_int("LOW_SEEDERS", 5)
 
 # Actions to take
 RESUME_CRITICAL = get_env_bool("RESUME_CRITICAL", True)
