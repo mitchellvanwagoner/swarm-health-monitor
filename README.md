@@ -17,18 +17,21 @@ Add to your `docker-compose.yml`:
 
 ```yaml
   swarm-health-monitor:
-    build: /mnt/user/appdata/swarm-health-monitor
-    container_name: swarm-health-monitor
-    restart: unless-stopped
+    build: 'ghcr.io/mitchellvanwagoner/swarm-health-monitor:latest'
+    container_name: 'swarm-health-monitor'
+    restart: 'unless-stopped'
     environment:
-      - TZ=$TZ
-      - QBITTORRENT_URL=http://qbittorrentvpn:6767
-      - QBITTORRENT_USER=admin
-      - QBITTORRENT_PASS=your-password-here
-      - CHECK_INTERVAL_DAYS=30
-      - RUN_INTERVAL_HOURS=24
+      - 'PUID=$PUID'
+      - 'PGID=$PGID'
+      - 'UMASK=$UMASK'
+      - 'TZ=$TZ'
+      - 'QBITTORRENT_URL=http://qbittorrentvpn:6767'
+      - 'QBITTORRENT_USER=admin'
+      - 'QBITTORRENT_PASS=your-password-here'
+      - 'CHECK_INTERVAL_DAYS=30'
+      - 'RUN_INTERVAL_HOURS=24'
     volumes:
-      - /mnt/user/appdata/swarm-health-monitor/config:/config
+      - '/mnt/user/appdata/swarm-health-monitor:/config'
     network_mode: 'service:qbittorrentvpn'
     depends_on:
       qbittorrentvpn:
