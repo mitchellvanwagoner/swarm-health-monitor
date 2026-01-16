@@ -256,21 +256,62 @@ class QBittorrentAPI:
             logging.error(f"Failed to set priority: {e}")
             return False
     
-    def increase_priority(self, torrent_hash):
-        """Increase torrent priority by one."""
+    def set_rare_priority(self, torrent_hash):
+        """Set rare priority: move to top, then decrease by one (so it's below critical)."""
         if not self._authenticated:
             if not self.login():
                 return False
         
         try:
+            # First move to top
             response = self.session.post(
-                f"{self.url}/api/v2/torrents/increasePrio",
+                f"{self.url}/api/v2/torrents/topPrio",
+                data={"hashes": torrent_hash},
+                timeout=30
+            )
+            if response.status_code != 200:
+                return False
+            
+            # Then decrease by one so it's below critical torrents
+            response = self.session.post(
+                f"{self.url}/api/v2/torrents/decreasePrio",
                 data={"hashes": torrent_hash},
                 timeout=30
             )
             return response.status_code == 200
         except requests.exceptions.RequestException as e:
-            logging.error(f"Failed to increase priority: {e}")
+            logging.error(f"Failed to set rare priority: {e}")
+            return False
+    
+    def set_low_priority(self, torrent_hash):
+        """Set low priority: move to top, then decrease by two (below critical and rare)."""
+        if not self._authenticated:
+            if not self.login():
+                return False
+        
+        try:
+            # First move to top
+            response = self.session.post(
+                f"{self.url}/api/v2/torrents/topPrio",
+                data={"hashes": torrent_hash},
+                timeout=30
+            )
+            if response.status_code != 200:
+                return False
+            
+            # Decrease twice so it's below critical and rare
+            for _ in range(2):
+                response = self.session.post(
+                    f"{self.url}/api/v2/torrents/decreasePrio",
+                    data={"hashes": torrent_hash},
+                    timeout=30
+                )
+                if response.status_code != 200:
+                    return False
+            
+            return True
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Failed to set low priority: {e}")
             return False
 
 
@@ -356,6 +397,7 @@ def run_check(qbt, state_manager):
     # Check torrents that need it
     critical_torrents = []
     rare_torrents = []
+    low_torrents = []
     checked_count = 0
     
     for torrent in torrents_to_check:
@@ -388,6 +430,9 @@ def run_check(qbt, state_manager):
         elif classification == "RARE":
             rare_torrents.append(torrent_info)
             logging.info(f"  RARE [{seeder_count} seeds]: {torrent_info['name']}")
+        elif classification == "LOW":
+            low_torrents.append(torrent_info)
+            logging.debug(f"  LOW [{seeder_count} seeds]: {torrent_info['name']}")
         
         # Save state periodically
         if checked_count % 50 == 0:
@@ -398,19 +443,28 @@ def run_check(qbt, state_manager):
     stats = state_manager.get_stats()
     logging.info("")
     logging.info(f"Overall distribution (all tracked torrents): {stats}")
-    logging.info(f"This run - Critical: {len(critical_torrents)}, Rare: {len(rare_torrents)}")
+    logging.info(f"This run - Critical: {len(critical_torrents)}, Rare: {len(rare_torrents)}, Low: {len(low_torrents)}")
     
     # Take actions
     actions_taken = 0
-    
-    if RESUME_CRITICAL and critical_torrents:
+
+    if SET_PRIORITIES and (critical_torrents or rare_torrents or low_torrents):
         logging.info("")
-        logging.info("Checking critical torrents for resume...")
+        logging.info("Adjusting queue priorities...")
+        # Process in order: LOW first, then RARE, then CRITICAL
+        # This ensures final priority order: CRITICAL > RARE > LOW > HEALTHY
+        for t in low_torrents:
+            if qbt.set_low_priority(t['hash']):
+                logging.debug(f"  Set LOW priority: {t['name']}")
+                actions_taken += 1
+        for t in rare_torrents:
+            if qbt.set_rare_priority(t['hash']):
+                logging.debug(f"  Set RARE priority: {t['name']}")
+                actions_taken += 1
         for t in critical_torrents:
-            if t['state'] in ['pausedUP', 'pausedDL', 'stoppedUP', 'stoppedDL']:
-                logging.info(f"  Resuming: {t['name']}")
-                if qbt.resume_torrent(t['hash']):
-                    actions_taken += 1
+            if qbt.set_top_priority(t['hash']):
+                logging.debug(f"  Set CRITICAL priority: {t['name']}")
+                actions_taken += 1
     
     if RESUME_RARE and rare_torrents:
         logging.info("")
@@ -420,16 +474,15 @@ def run_check(qbt, state_manager):
                 logging.info(f"  Resuming: {t['name']}")
                 if qbt.resume_torrent(t['hash']):
                     actions_taken += 1
-    
-    if SET_PRIORITIES and (critical_torrents or rare_torrents):
+
+    if RESUME_CRITICAL and critical_torrents:
         logging.info("")
-        logging.info("Adjusting queue priorities...")
+        logging.info("Checking critical torrents for resume...")
         for t in critical_torrents:
-            if qbt.set_top_priority(t['hash']):
-                actions_taken += 1
-        for t in rare_torrents:
-            if qbt.increase_priority(t['hash']):
-                actions_taken += 1
+            if t['state'] in ['pausedUP', 'pausedDL', 'stoppedUP', 'stoppedDL']:
+                logging.info(f"  Resuming: {t['name']}")
+                if qbt.resume_torrent(t['hash']):
+                    actions_taken += 1
     
     # Save final state
     state_manager.save_state()

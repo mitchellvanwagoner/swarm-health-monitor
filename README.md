@@ -21,9 +21,8 @@ Add to your `docker-compose.yml`:
     image: 'ghcr.io/mitchellvanwagoner/swarm-health-monitor:latest'
     restart: 'unless-stopped'
     environment:
-      - 'PUID=$PUID'
-      - 'PGID=$PGID'
-      - 'UMASK=$UMASK'
+      - 'PUID=99'
+      - 'PGID=100'
       - 'TZ=$TZ'
       - 'QBITTORRENT_URL=http://qbittorrentvpn:6767'
       - 'QBITTORRENT_USER=admin'
@@ -76,8 +75,8 @@ This means with default settings:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PUID` | `1000` | User ID to run as |
-| `PGID` | `1000` | Group ID to run as |
+| `PUID` | `99` | User ID to run as |
+| `PGID` | `100` | Group ID to run as |
 
 ### Connection
 
