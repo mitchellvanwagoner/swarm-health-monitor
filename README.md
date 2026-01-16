@@ -1,4 +1,4 @@
-# Rare Torrent Keeper
+# Swarm Health Monitor
 
 A Docker container that monitors your qBittorrent torrents, identifies those with few seeders, and automatically prioritizes them to keep rare content alive.
 
