@@ -489,6 +489,7 @@ def run_check(qbt, state_manager):
     
     logging.info("")
     logging.info(f"Checked {checked_count} torrents, actions taken: {actions_taken}")
+    logging.info(f"This run - Critical: {len(critical_torrents)}, Rare: {len(rare_torrents)}, Low: {len(low_torrents)}")
     logging.info(f"Run completed at {datetime.now()}")
     logging.info("=" * 60)
 
@@ -528,7 +529,6 @@ def main():
         if shutdown_requested:
             break
         
-        logging.info(f"Seeder thresholds - Critical: <={CRITICAL_SEEDERS}, Rare: <={RARE_SEEDERS}, Low: <={LOW_SEEDERS}")
         logging.info(f"Next run in {RUN_INTERVAL_HOURS} hours. Sleeping...")
         
         # Sleep in small increments to respond to shutdown signals
