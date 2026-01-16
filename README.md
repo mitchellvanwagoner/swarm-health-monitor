@@ -98,9 +98,9 @@ This means with default settings:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CRITICAL_SEEDERS` | `2` | Torrents with ≤ this many seeders are critical |
-| `RARE_SEEDERS` | `5` | Torrents with ≤ this many seeders are rare |
-| `LOW_SEEDERS` | `10` | Torrents with ≤ this many seeders are low |
+| `CRITICAL_SEEDERS` | `1` | Torrents with ≤ this many seeders are critical |
+| `RARE_SEEDERS` | `2` | Torrents with ≤ this many seeders are rare |
+| `LOW_SEEDERS` | `5` | Torrents with ≤ this many seeders are low |
 
 ### Actions
 
@@ -116,40 +116,6 @@ This means with default settings:
 |----------|---------|-------------|
 | `STATE_FILE` | `/config/state.json` | Path to persistent state file |
 | `DEBUG` | `false` | Enable debug logging |
-
-## Example Configurations
-
-### Conservative (minimal intervention)
-```yaml
-environment:
-  - CHECK_INTERVAL_DAYS=60      # Check each torrent every 2 months
-  - RUN_INTERVAL_HOURS=168      # Run weekly
-  - RESUME_CRITICAL=true
-  - RESUME_RARE=false
-  - SET_PRIORITIES=false        # Don't touch priorities
-```
-
-### Aggressive (keep everything alive)
-```yaml
-environment:
-  - CHECK_INTERVAL_DAYS=7       # Check weekly
-  - RUN_INTERVAL_HOURS=6        # Run 4x daily
-  - CRITICAL_SEEDERS=3
-  - RARE_SEEDERS=10
-  - RESUME_CRITICAL=true
-  - RESUME_RARE=true
-  - SET_PRIORITIES=true
-```
-
-### Private tracker focused
-```yaml
-environment:
-  - CHECK_INTERVAL_DAYS=14      # Check every 2 weeks
-  - CRITICAL_SEEDERS=1          # Only you seeding = critical
-  - RARE_SEEDERS=3
-  - RESUME_CRITICAL=true
-  - RESUME_RARE=true
-```
 
 ## State File
 
