@@ -17,15 +17,15 @@ Add to your `docker-compose.yml`:
 
 ```yaml
   swarm-health-monitor:
-    build: 'ghcr.io/mitchellvanwagoner/swarm-health-monitor:latest'
     container_name: 'swarm-health-monitor'
+    image: 'ghcr.io/mitchellvanwagoner/swarm-health-monitor:latest'
     restart: 'unless-stopped'
     environment:
       - 'PUID=$PUID'
       - 'PGID=$PGID'
       - 'UMASK=$UMASK'
       - 'TZ=$TZ'
-      - 'QBITTORRENT_URL=http://qbittorrentvpn:6767'
+      - 'QBITTORRENT_URL=http://localhost:6767'
       - 'QBITTORRENT_USER=admin'
       - 'QBITTORRENT_PASS=your-password-here'
       - 'CHECK_INTERVAL_DAYS=30'
