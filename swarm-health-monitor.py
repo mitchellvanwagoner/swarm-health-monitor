@@ -75,6 +75,8 @@ def signal_handler(signum, frame):
     """Handle shutdown signals gracefully."""
     global shutdown_requested
     logging.info(f"Received signal {signum}, shutting down gracefully...")
+    logging.info("=" * 60)
+    logging.info("\n" * 2)
     shutdown_requested = True
 
 
@@ -358,6 +360,7 @@ def format_size(size_bytes):
 
 def run_check(qbt, state_manager):
     """Run a single check cycle."""
+    logging.info("\n" * 2)
     logging.info("=" * 60)
     logging.info(f"Starting check run at {datetime.now()}")
     logging.info(f"Check interval: {CHECK_INTERVAL_DAYS} days per torrent")
@@ -503,6 +506,7 @@ def main():
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
     
+    logging.info("\n" * 2)
     logging.info("Swarm health monitor starting up...")
     logging.info(f"qBittorrent URL: {QBITTORRENT_URL}")
     logging.info(f"Check interval: {CHECK_INTERVAL_DAYS} days per torrent")
@@ -530,6 +534,8 @@ def main():
             break
         
         logging.info(f"Next run in {RUN_INTERVAL_HOURS} hours. Sleeping...")
+        logging.info("=" * 60)
+        logging.info("\n" * 2)
         
         # Sleep in small increments to respond to shutdown signals
         sleep_until = time.time() + run_interval_seconds
